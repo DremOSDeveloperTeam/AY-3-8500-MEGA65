@@ -1,3 +1,6 @@
 [submodule "QNICE"]
 	path = M2M/QNICE
 	url = https://github.com/sy2002/QNICE-FPGA
+[submodule "CORE/AY-3-8500-MiSTer-MEGA65"]
+	path = CORE/AY-3-8500-MiSTer-MEGA65
+	url = https://github.com/DremOSDeveloperTeam/AY-3-8500-MiSTer-MEGA65
