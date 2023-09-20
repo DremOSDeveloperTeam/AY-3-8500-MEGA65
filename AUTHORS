@@ -1,38 +1,29 @@
-YOUR PROJECT NAME for MEGA65 aka GITHUB REPO SHORT NAME
-=======================================================
+AY-3-8500-MEGA65 for MEGA65
+===========================
 
-done in YEAR by YOUR NAME
+done in 2023- by Katie Martin
 
-YOUR WEBSITE
-YOUR GITHUB SITE
+WEBSITE: https://innovation-inc.org
 
-REPO SHORT NAME is licensed under the terms of GNU/GPL v3, for more information please read the file LICENSE
-Parts of REPO SHORT NAME are licensed under other Free-software licenses as described in the source code
+GIT WEBSITE: https://github.com/DremOSDeveloperTeam/
 
-GITHUB REPO SHORT NAME:
------------------------
+PERSONAL GIT SITE (most of my projects are here!): https://git.innovation-inc.org/
 
-  GITHUB REPO SHORT NAME is a port of MISTER'S REPO SHORT NAME
+AY-3-8500-MEGA65 is licensed under the terms of GNU/GPL v3, for more information please read the file LICENSE
+Parts of AY-3-8500-MEGA65 are licensed under other Free-software licenses as described in the source code
+
+AY-3-8500-MEGA65:
+-----------------
+
+  AY-3-8500-MEGA65 is a port of AY-3-8500-MiSTer
       done by the MiSTer Development Team
-      Original GitHub Repository: https://github.com/MiSTer-devel/MISTER-REPO-LINK
+      Original GitHub Repository: https://github.com/MiSTer-devel/AY-3-8500-MiSTer
       Significant contributors:
-      * NAME THE MAIN
-      * CONTRIBUTORS
-      * ON MiSTer's SIDE
+      * Cole Johnson (https://github.com/TheProgrammerIncarnate)
+      * Alexey Melnikov (https://github.com/sorgelig)
 
-  MISTER'S REPO SHORT NAME is a port of MiST's MiST NAME/OTHER SOURCE IN CASE MiSTer ported it from MIST/OTHER SOURCE
-      done by the MiST Development Team
-      Original GitHub Repository: https://github.com/mist-devel/MIST-REPO-LINK OR OTHER SOURCE
-      Significant contributors:
-      * NAME THE MAIN
-      * CONTRIBUTORS
-      * ON MiST's SIDE (OR OTHER SOURCE)
-
-  LIST SOME MORE SIGNIFICANT / MAIN AUTHERS OF SUBMODULES
-  HAVE A LOOK AT THIS EXAMPLE HOW TO: https://github.com/sy2002/gbc4mega65/blob/master/AUTHORS
-
-Other than that and my own work, REPO SHORT NAME uses:
-------------------------------------------------------
+Other than that and my own work, AY-3-8500-MEGA65 uses:
+-------------------------------------------------------
 
 DO NOT FORGET TO CREDIT EVERYTHING YOU USE FROM OTHER PEOPLE HERE
 THE FOLLOWING LIST NEEDS ALWAYS TO BE PART OF YOUR LIST:
