@@ -52,7 +52,7 @@ end process p_clk_divider;
 end synthesis;
 
 -- Blankinator (glue logic that handles blanking)
--- Translated from the logic in AY-3-8500.sv (SystemVerilog to regular ol' Verilog)
+-- Translated from the logic in AY-3-8500.sv (SystemVerilog to vHDL)
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
@@ -83,7 +83,7 @@ begin
             vcnt    <= (others=>'0');
             old_hs  <= '0';
             old_vs  <= '0';
-        else
+        elsif(rising_edge(i_clk_2m)) then
             hcnt <= std_logic_vector(unsigned(hcnt)+1);
             old_hs <= i_hsync;
             if(old_hs and (not i_hsync)) then
