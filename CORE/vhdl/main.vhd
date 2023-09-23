@@ -193,6 +193,7 @@ end component ay38500NTSC;
 
 
 signal ce_2m                  : std_logic;      -- A 2 MHz clock signal derived from the main 48 MHz clock (48/24)
+signal ce_6m                  : std_logic;      -- A 6 MHz clock signal used for the pixel clock (48/8)
 
 signal chip_video_hs          : std_logic;      -- Chip's hs
 signal chip_video_vs          : std_logic;      -- Chip's hs
@@ -211,6 +212,14 @@ begin
             i_rst           => reset_soft_i or reset_hard_i,
             i_clk_divider   => std_logic_vector(to_unsigned(24, 4)), -- integer 24 --> unsigned(3 downto 0)
             o_clk           => ce_2m
+        );
+        
+     i_ce_6m      : entity work.clock_div
+        port map(
+            i_clk           => clk_main_i,
+            i_rst           => reset_soft_i or reset_hard_i,
+            i_clk_divider   => std_logic_vector(to_unsigned(8, 4)),
+            o_clk           => ce_6m
         );
         
      i_blankinator : entity work.blankinator
@@ -297,7 +306,9 @@ begin
    --             resolution specified by VGA_DX/VGA_DY (globals.vhd)
    -- video_retro15kHz_o: '1', if the output from the core (post-scandoubler) in the retro 15 kHz analog RGB mode.
    --             Hint: Scandoubler off does not automatically mean retro 15 kHz on.
+   video_ce_o     <= ce_6m;
    video_ce_ovl_o <= video_ce_o;
+   --video_retro15khz_o   <= '1'; -- Confused about this, just set qnice_retro15kHz_o to 1 manually (mega65.vhd)
 
    -- @TODO: Keyboard mapping and keyboard behavior
    -- Each core is treating the keyboard in a different way: Some need low-active "matrices", some

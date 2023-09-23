@@ -289,7 +289,7 @@ begin
    --    "Standard VGA":                     qnice_retro15kHz_o=0 and qnice_csync_o=0
    --    "Retro 15 kHz with HSync and VSync" qnice_retro15kHz_o=1 and qnice_csync_o=0
    --    "Retro 15 kHz with CSync"           qnice_retro15kHz_o=1 and qnice_csync_o=1
-   qnice_retro15kHz_o         <= '0';
+   qnice_retro15kHz_o         <= '1';
    qnice_csync_o              <= '0';
    qnice_osm_cfg_scaling_o    <= (others => '1');
 
