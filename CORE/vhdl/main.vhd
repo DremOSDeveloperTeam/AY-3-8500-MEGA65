@@ -96,8 +96,8 @@ begin
             
             if (hcnt = std_logic_vector(to_unsigned(21, 10)))   then o_hblank <= '0'; end if;
             if (hcnt = std_logic_vector(to_unsigned(100, 10)))  then o_hblank <= '1'; end if;
-            if (vcnt = std_logic_vector(to_unsigned(34, 10)))   then o_hblank <= '0'; end if;
-            if (vcnt = std_logic_vector(to_unsigned(240, 10)))  then o_hblank <= '1'; end if;
+            if (vcnt = std_logic_vector(to_unsigned(34, 10)))   then o_vblank <= '0'; end if;
+            if (vcnt = std_logic_vector(to_unsigned(240, 10)))  then o_vblank <= '1'; end if;
         end if;
     end process p_blankinator;
 end synthesis;
@@ -308,7 +308,7 @@ begin
    --             Hint: Scandoubler off does not automatically mean retro 15 kHz on.
    video_ce_o     <= ce_6m;
    video_ce_ovl_o <= video_ce_o;
-   --video_retro15khz_o   <= '1'; -- Confused about this, just set qnice_retro15kHz_o to 1 manually (mega65.vhd)
+   --video_retro15khz_o   <= '1'; -- Just set qnice_retro15kHz_o to 1 manually (mega65.vhd)
 
    -- @TODO: Keyboard mapping and keyboard behavior
    -- Each core is treating the keyboard in a different way: Some need low-active "matrices", some
