@@ -83,12 +83,9 @@ port (
    video_rst_o             : out std_logic;
    video_ce_o              : out std_logic;
    video_ce_ovl_o          : out std_logic;
-   --video_red_o             : out std_logic_vector(7 downto 0);
-   --video_green_o           : out std_logic_vector(7 downto 0);
-   --video_blue_o            : out std_logic_vector(7 downto 0);
-   video_red_o             : out std_logic; -- We're not doing color for now, so std_logic is fine.
-   video_green_o           : out std_logic;
-   video_blue_o            : out std_logic;
+   video_red_o             : out std_logic_vector(7 downto 0);
+   video_green_o           : out std_logic_vector(7 downto 0);
+   video_blue_o            : out std_logic_vector(7 downto 0);
    video_vs_o              : out std_logic;
    video_hs_o              : out std_logic;
    video_hblank_o          : out std_logic;
