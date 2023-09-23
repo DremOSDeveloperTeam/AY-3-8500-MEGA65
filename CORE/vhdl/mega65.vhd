@@ -83,9 +83,12 @@ port (
    video_rst_o             : out std_logic;
    video_ce_o              : out std_logic;
    video_ce_ovl_o          : out std_logic;
-   video_red_o             : out std_logic_vector(7 downto 0);
-   video_green_o           : out std_logic_vector(7 downto 0);
-   video_blue_o            : out std_logic_vector(7 downto 0);
+   --video_red_o             : out std_logic_vector(7 downto 0);
+   --video_green_o           : out std_logic_vector(7 downto 0);
+   --video_blue_o            : out std_logic_vector(7 downto 0);
+   video_red_o             : out std_logic; -- We're not doing color for now, so std_logic is fine.
+   video_green_o           : out std_logic;
+   video_blue_o            : out std_logic;
    video_vs_o              : out std_logic;
    video_hs_o              : out std_logic;
    video_hblank_o          : out std_logic;
@@ -185,12 +188,12 @@ signal qnice_demo_vd_we       : std_logic;
 begin
 
    -- MMCME2_ADV clock generators:
-   --   @TODO YOURCORE:       54 MHz
+   --   ay38500NTSC core:       48 MHz
    clk_gen : entity work.clk
       port map (
          sys_clk_i         => CLK,             -- expects 100 MHz
          sys_rstn_i        => RESET_M2M_N,     -- Asynchronous, asserted low
-         main_clk_o        => main_clk,        -- CORE's 54 MHz clock
+         main_clk_o        => main_clk,        -- CORE's 48 MHz clock
          main_rst_o        => main_rst         -- CORE's reset, synchronized
       ); -- clk_gen
 

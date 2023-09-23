@@ -22,7 +22,7 @@ entity clk is
       sys_clk_i       : in  std_logic;   -- expects 100 MHz
       sys_rstn_i      : in  std_logic;   -- Asynchronous, asserted low
 
-      main_clk_o      : out std_logic;   -- main's @TODO 54 MHz main clock
+      main_clk_o      : out std_logic;   -- main's 48 MHz main clock
       main_rst_o      : out std_logic    -- main's reset, synchronized
    );
 end entity clk;
@@ -57,7 +57,7 @@ begin
          CLKFBOUT_MULT_F      => 6.750,      -- 675 MHz
          CLKFBOUT_PHASE       => 0.000,
          CLKFBOUT_USE_FINE_PS => FALSE,
-         CLKOUT0_DIVIDE_F     => 12.500,     -- 54 MHz
+         CLKOUT0_DIVIDE_F     => 14.0625,    -- 48 MHz
          CLKOUT0_PHASE        => 0.000,
          CLKOUT0_DUTY_CYCLE   => 0.500,
          CLKOUT0_USE_FINE_PS  => FALSE
