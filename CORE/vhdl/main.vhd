@@ -20,6 +20,7 @@ port(
   i_clk         : in  std_logic;
   i_rst         : in  std_logic;
   i_clk_divider : in  std_logic_vector(4 downto 0);
+  i_duty_cycle  : in  std_logic;                       -- This changes the behavior of the clock divider by either making the duty cycle ~50% or as short as possible. Fixes issues with CE timing.
   o_clk         : out std_logic);
 end clock_div;
 architecture synthesis of clock_div is
@@ -45,7 +46,11 @@ begin
       o_clk           <= '1';
     else
       r_clk_counter   <= r_clk_counter + 1;
-      o_clk           <= '1';
+      if (i_duty_cycle = '1') then
+          o_clk           <= '0';
+      else
+          o_clk           <= '1';
+      end if;
     end if;
   end if;
 end process p_clk_divider;
@@ -246,6 +251,7 @@ begin
             i_clk           => clk_main_i,
             i_rst           => reset_soft_i or reset_hard_i,
             i_clk_divider   => clock_div_2m_i, 
+            i_duty_cycle    => '0',
             o_clk           => ce_2m
         );
         
@@ -254,6 +260,7 @@ begin
             i_clk           => clk_main_i,
             i_rst           => reset_soft_i or reset_hard_i,
             i_clk_divider   => clock_div_6m_i, 
+            i_duty_cycle    => '1',
             o_clk           => ce_6m
         );
      
