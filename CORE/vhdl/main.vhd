@@ -67,7 +67,8 @@ entity blankinator is
         i_vsync         : in std_logic;
         i_hsync         : in std_logic;
         o_vblank        : out std_logic;
-        o_hblank        : out std_logic
+        o_hblank        : out std_logic;
+        o_notblanking   : out std_logic
     );
 end blankinator;
 architecture synthesis of blankinator is
@@ -98,6 +99,12 @@ begin
             if (hcnt = std_logic_vector(to_unsigned(100, 10)))  then o_hblank <= '1'; end if;
             if (vcnt = std_logic_vector(to_unsigned(34, 10)))   then o_vblank <= '0'; end if;
             if (vcnt = std_logic_vector(to_unsigned(240, 10)))  then o_vblank <= '1'; end if;
+            
+            if (o_hblank or o_vblank) then
+                o_notblanking <= '0';
+            else
+                o_notblanking <= '1';
+            end if;
         end if;
     end process p_blankinator;
 end synthesis;
@@ -174,20 +181,35 @@ component ay38500NTSC is
         -- @TODO All wiring
         -- I think this is roughly how this should work, but for now I'm only
         --   focusing on video and clocks to get a sign of life!    
-        -- pinRPout              : out std_logic;
-        -- pinLPout              : out std_logic;
-        -- pinBallOut            : out std_logic;
-        -- pinManualServe        : in std_logic
+        pinBallOut            : out std_logic;
+        pinRPout              : out std_logic;  -- Right player output
+        pinLPout              : out std_logic;  -- Left player output
+        pinSFout              : out std_logic;  -- Score field out
         clk                   : in std_logic;   -- 2 (or 6 MHz..?)
         superclock            : in std_logic;   -- 48 MHz
         reset                 : in std_logic;   -- Reset pin
         syncH                 : out std_logic;  -- Horizontal sync
         syncV                 : out std_logic;  -- Vertical sync
-        pinRPout              : out std_logic;  -- Right player output
-        pinLPout              : out std_logic;  -- Left player output
-        pinSFout              : out std_logic;  -- Score field out
-        pinSound              : out std_logic   -- Chip's sound
-        
+        pinSound              : out std_logic;  -- Chip's sound
+        pinManualServe        : in std_logic;   -- Manually serve the ball
+        pinRPin_DWN           : out std_logic;  --
+        pinLPin_DWN           : out std_logic;  --
+        pinRPin               : in std_logic;   -- Right pin control
+        pinLPin               : in std_logic;   -- Left pin control
+        pinBatSize            : in std_logic;   -- 1 = Large, 0 = Small
+        pinBallSpeed          : in std_logic;   -- 1 = Normal, 0 = Fast as fuck
+        pinBallAngle          : in std_logic;   -- 1 = 2 rebound angles, 0 = 4
+        pinSyncOut            : out std_logic;  --
+        pinHitIn              : in std_logic;   --
+        pinRifle1_DWN         : out std_logic;  --
+        pinShotIn             : in std_logic;   --
+        pinTennis_DWN         : out std_logic;  --
+        pinTennis             : in std_logic;   -- Tennis game
+        pinSoccer             : in std_logic;   -- Soccer game
+        pinSquash             : in std_logic;   -- Squash game
+        pinPractice           : in std_logic;   -- Practice game
+        pinRifle1             : in std_logic;   -- Rifle game 1
+        pinRifle2             : in std_logic    -- Rifle game 2
     );
 end component ay38500NTSC;
 
@@ -195,14 +217,34 @@ end component ay38500NTSC;
 signal ce_2m                  : std_logic;      -- A 2 MHz clock signal derived from the main 48 MHz clock (48/24)
 signal ce_6m                  : std_logic;      -- A 6 MHz clock signal used for the pixel clock (48/8)
 
-signal chip_video_hs          : std_logic;      -- Chip's hs
-signal chip_video_vs          : std_logic;      -- Chip's hs
+signal chip_video_hs          : std_logic;      -- Chip's horizontal sync
+signal chip_video_vs          : std_logic;      -- Chip's vertical sync
 signal chip_video_field       : std_logic;      -- Chip score field, 
 signal chip_video_rp          : std_logic;      -- Right player video
 signal chip_video_lp          : std_logic;      -- Left player video
 signal chip_video             : std_logic;      -- Final video signal for the chip.
 signal chip_ball              : std_logic;      -- Chip ball output @TODO make it possible to hide
 signal chip_sound             : std_logic;      -- Chip's sound pin
+
+signal video_notblanking_o    : std_logic;      -- A signal that is high if there is blanking. For debug.
+
+-- Controls for the game
+signal manual_serve_i                : std_logic;      -- Manually serve
+signal right_player_i                : std_logic;      -- Right player
+signal left_player_i                 : std_logic;      -- Left player
+signal bat_size_i                    : std_logic;      -- Size of the bat
+signal ball_speed_i                  : std_logic;      -- The speed of the ball
+signal ball_angle_i                  : std_logic;      -- Ball angles
+signal rifle_hit_i                   : std_logic;      -- Rifle hit
+signal rifle_shot_i                  : std_logic;      -- Rifle shot 
+
+-- Games
+signal game_tennis_i                 : std_logic;
+signal game_soccer_i                 : std_logic;
+signal game_squash_i                 : std_logic;
+signal game_practice_i               : std_logic;
+signal game_rifle1_i                 : std_logic;
+signal game_rifle2_i                 : std_logic;
 
 begin
 
@@ -229,12 +271,13 @@ begin
             i_vsync         => chip_video_vs,
             i_hsync         => chip_video_hs,
             o_vblank        => video_vblank_o,
-            o_hblank        => video_hblank_o
+            o_hblank        => video_hblank_o,
+            o_notblanking   => video_notblanking_o
         );
 
      i_ay38500NTSC : ay38500NTSC
         port map (
-            clk               => ce_2m,                             -- @TODO allow change to 6 MHz for "arcade graphics"... whatever that means
+            clk               => ce_2m,                             -- 2 MHz clock used for a reason
             superclock        => clk_main_i,
             reset             => reset_soft_i or reset_hard_i,      -- Long and short press of reset button mean the same
             syncH             => chip_video_hs,
@@ -242,23 +285,61 @@ begin
             pinRPout          => chip_video_rp,
             pinLPout          => chip_video_lp,
             pinSFout          => chip_video_field,
-            pinSound          => chip_sound
+            pinSound          => chip_sound,
+            pinManualServe    => manual_serve_i,
+            pinRPin           => right_player_i,
+            pinLPin           => left_player_i,
+            pinBatSize        => bat_size_i,
+            pinBallSpeed      => ball_speed_i,
+            pinBallAngle      => ball_angle_i,
+            pinHitIn          => rifle_hit_i,
+            pinShotIn         => rifle_shot_i,
+            pinTennis         => game_tennis_i,
+            pinSoccer         => game_soccer_i,
+            pinSquash         => game_squash_i,
+            pinPractice       => game_practice_i,
+            pinRifle1         => game_rifle1_i,
+            pinRifle2         => game_rifle2_i
         ); -- i_ay38500NTSC (the chip itself)
         
         -- The below connects ALL video signals to chip_video.
         -- @TODO make it possible to hide elements (such as players or the ball). Maybe.
-        chip_video          <= chip_ball;           -- Ball         --> AV video output
-        chip_video          <= chip_video_field;    -- Field        --> AV video output
-        chip_video          <= chip_video_lp;       -- Left player  --> AV video output
-        chip_video          <= chip_video_rp;       -- Right player --> AV video output
+        chip_video            <= chip_ball;           -- Ball         --> AV video output |
+        chip_video            <= chip_video_field;    -- Field        --> AV video output |
+        chip_video            <= chip_video_lp;       -- Left player  --> AV video output |
+        chip_video            <= chip_video_rp;       -- Right player --> AV video output |--> A single signal
         
         -- Connect chip video output to the main video output
         -- @TODO color logic. Currently black and white ONLY
-        video_red_o           <= (others=>chip_video);
-        video_green_o         <= (others=>chip_video);
-        video_blue_o          <= (others=>chip_video);
+        --video_red_o           <= (others=>chip_video);
+        --video_green_o         <= (others=>chip_video);
+        --video_blue_o          <= (others=>chip_video);
+        
+        -- Should make a red screen
+        video_red_o           <= std_logic_vector(to_unsigned(0, 8)) when video_notblanking_o = '0' else std_logic_vector(to_unsigned(255, 8));
+        video_green_o         <= std_logic_vector(to_unsigned(0, 8));
+        video_blue_o          <= std_logic_vector(to_unsigned(0, 8));
         video_hs_o            <= chip_video_hs;
         video_vs_o            <= chip_video_vs;
+        
+        manual_serve_i        <= '0';   -- @TODO this currently permenantly enables automatic serving. This should later be a choice for the user.
+        right_player_i        <= '0';   -- @TODO this just ties it low. Pretty sure this would just make it stuck "down" but im not entirely sure?
+        left_player_i         <= '0';
+        bat_size_i            <= '1';   -- @TODO this just makes the bat always large. This should be a choice for the player.
+        ball_speed_i          <= '1';   -- @TODO this just makes the ball speed always normal. Should be a choice.
+        ball_angle_i          <= '1';   -- @TODO this should be a choice
+        rifle_hit_i           <= '0';   -- @TODO rifle support
+        rifle_shot_i          <= '0';
+        
+        -- Games
+        -- @TODO game selection. Currently forced to be tennis.
+        game_tennis_i         <= '0';
+        game_soccer_i         <= '1';
+        game_squash_i         <= '1';
+        game_practice_i       <= '1';
+        game_rifle1_i         <= '1';
+        game_rifle2_i         <= '1'; 
+        
         
     /*i_chip : module work.ay38500NTSC
         port map (
