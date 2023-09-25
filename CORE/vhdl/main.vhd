@@ -19,13 +19,13 @@ entity clock_div is
 port(
   i_clk         : in  std_logic;
   i_rst         : in  std_logic;
-  i_clk_divider : in  std_logic_vector(3 downto 0);
+  i_clk_divider : in  std_logic_vector(4 downto 0);
   o_clk         : out std_logic);
 end clock_div;
 architecture synthesis of clock_div is
-signal r_clk_counter        : unsigned(3 downto 0);
-signal r_clk_divider        : unsigned(3 downto 0);
-signal r_clk_divider_half   : unsigned(3 downto 0);
+signal r_clk_counter        : unsigned(4 downto 0);
+signal r_clk_divider        : unsigned(4 downto 0);
+signal r_clk_divider_half   : unsigned(4 downto 0);
 begin
 p_clk_divider: process(i_rst,i_clk)
 begin
@@ -252,7 +252,7 @@ begin
         port map (
             i_clk           => clk_main_i,
             i_rst           => reset_soft_i or reset_hard_i,
-            i_clk_divider   => std_logic_vector(to_unsigned(24, 4)), -- integer 24 --> unsigned(3 downto 0)
+            i_clk_divider   => std_logic_vector(to_unsigned(24, 5)), -- integer 24 --> unsigned(4 downto 0)
             o_clk           => ce_2m
         );
         
@@ -260,7 +260,7 @@ begin
         port map(
             i_clk           => clk_main_i,
             i_rst           => reset_soft_i or reset_hard_i,
-            i_clk_divider   => std_logic_vector(to_unsigned(8, 4)),
+            i_clk_divider   => std_logic_vector(to_unsigned(8, 5)), -- integer 8 --> unsigned(4 downto 0)
             o_clk           => ce_6m
         );
         
