@@ -13,7 +13,7 @@ use ieee.numeric_std.all;
 library work;
 use work.video_modes_pkg.all;
 
--- Clock divider (used for 2 MHz clock)
+-- Clock divider (used for 2 MHz or 6 MHz clock)
 -- I just lifted this from here: https://surf-vhdl.com/how-to-implement-clock-divider-vhdl/
 entity clock_div is
 port(
@@ -29,14 +29,14 @@ signal r_clk_divider_half   : unsigned(4 downto 0);
 begin
 p_clk_divider: process(i_rst,i_clk)
 begin
-  if(i_rst='0') then
+  if(i_rst='1') then
     r_clk_counter       <= (others=>'0');
     r_clk_divider       <= (others=>'0');
     r_clk_divider_half  <= (others=>'0');
     o_clk               <= '0';
   elsif(rising_edge(i_clk)) then
     r_clk_divider       <= unsigned(i_clk_divider)-1;
-    r_clk_divider_half  <= unsigned('0'&i_clk_divider(3 downto 1)); -- half
+    r_clk_divider_half  <= unsigned('0'&i_clk_divider(4 downto 1)); -- half
     if(r_clk_counter < r_clk_divider_half) then 
       r_clk_counter   <= r_clk_counter + 1;
       o_clk           <= '0';
@@ -67,8 +67,7 @@ entity blankinator is
         i_vsync         : in std_logic;
         i_hsync         : in std_logic;
         o_vblank        : out std_logic;
-        o_hblank        : out std_logic;
-        o_notblanking   : out std_logic
+        o_hblank        : out std_logic
     );
 end blankinator;
 architecture synthesis of blankinator is
@@ -99,12 +98,6 @@ begin
             if (hcnt = std_logic_vector(to_unsigned(100, 10)))  then o_hblank <= '1'; end if;
             if (vcnt = std_logic_vector(to_unsigned(34, 10)))   then o_vblank <= '0'; end if;
             if (vcnt = std_logic_vector(to_unsigned(240, 10)))  then o_vblank <= '1'; end if;
-            
-            if (o_hblank or o_vblank) then
-                o_notblanking <= '0';
-            else
-                o_notblanking <= '1';
-            end if;
         end if;
     end process p_blankinator;
 end synthesis;
@@ -216,6 +209,8 @@ end component ay38500NTSC;
 
 signal ce_2m                  : std_logic;      -- A 2 MHz clock signal derived from the main 48 MHz clock (48/24)
 signal ce_6m                  : std_logic;      -- A 6 MHz clock signal used for the pixel clock (48/8)
+signal clock_div_2m_i         : std_logic_vector(4 downto 0);
+signal clock_div_6m_i         : std_logic_vector(4 downto 0);
 
 signal chip_video_hs          : std_logic;      -- Chip's horizontal sync
 signal chip_video_vs          : std_logic;      -- Chip's vertical sync
@@ -225,8 +220,6 @@ signal chip_video_lp          : std_logic;      -- Left player video
 signal chip_video             : std_logic;      -- Final video signal for the chip.
 signal chip_ball              : std_logic;      -- Chip ball output @TODO make it possible to hide
 signal chip_sound             : std_logic;      -- Chip's sound pin
-
-signal video_notblanking_o    : std_logic;      -- A signal that is high if there is blanking. For debug.
 
 -- Controls for the game
 signal manual_serve_i                : std_logic;      -- Manually serve
@@ -252,7 +245,7 @@ begin
         port map (
             i_clk           => clk_main_i,
             i_rst           => reset_soft_i or reset_hard_i,
-            i_clk_divider   => std_logic_vector(to_unsigned(24, 5)), -- integer 24 --> unsigned(4 downto 0)
+            i_clk_divider   => clock_div_2m_i, 
             o_clk           => ce_2m
         );
         
@@ -260,9 +253,12 @@ begin
         port map(
             i_clk           => clk_main_i,
             i_rst           => reset_soft_i or reset_hard_i,
-            i_clk_divider   => std_logic_vector(to_unsigned(8, 5)), -- integer 8 --> unsigned(4 downto 0)
+            i_clk_divider   => clock_div_6m_i, 
             o_clk           => ce_6m
         );
+     
+     clock_div_2m_i         <= std_logic_vector(to_unsigned(24, 5)); -- integer 24 --> unsigned(4 downto 0)
+     clock_div_6m_i         <= std_logic_vector(to_unsigned(8, 5));  -- integer 8 --> unsigned(4 downto 0)
         
      i_blankinator : entity work.blankinator
         port map (
@@ -271,15 +267,14 @@ begin
             i_vsync         => chip_video_vs,
             i_hsync         => chip_video_hs,
             o_vblank        => video_vblank_o,
-            o_hblank        => video_hblank_o,
-            o_notblanking   => video_notblanking_o
+            o_hblank        => video_hblank_o
         );
 
      i_ay38500NTSC : ay38500NTSC
         port map (
             clk               => ce_2m,                             -- 2 MHz clock used for a reason
             superclock        => clk_main_i,
-            reset             => reset_soft_i or reset_hard_i,      -- Long and short press of reset button mean the same
+            reset             => (not reset_soft_i) or (not reset_hard_i),      -- Long and short press of reset button mean the same
             syncH             => chip_video_hs,
             syncV             => chip_video_vs,
             pinRPout          => chip_video_rp,
@@ -316,7 +311,7 @@ begin
         --video_blue_o          <= (others=>chip_video);
         
         -- Should make a red screen
-        video_red_o           <= std_logic_vector(to_unsigned(0, 8)) when video_notblanking_o = '0' else std_logic_vector(to_unsigned(255, 8));
+        video_red_o           <= std_logic_vector(to_unsigned(0, 8)) when (video_hblank_o = '1' or video_vblank_o = '1') else std_logic_vector(to_unsigned(255, 8));
         video_green_o         <= std_logic_vector(to_unsigned(0, 8));
         video_blue_o          <= std_logic_vector(to_unsigned(0, 8));
         video_hs_o            <= chip_video_hs;
