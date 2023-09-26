@@ -290,6 +290,7 @@ begin
             pinRPout          => chip_video_rp,
             pinLPout          => chip_video_lp,
             pinSFout          => chip_video_field,
+            pinBallOut        => chip_ball,
             pinSound          => chip_sound,
             pinManualServe    => manual_serve_i,
             pinRPin           => right_player_i,
