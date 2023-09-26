@@ -313,7 +313,8 @@ begin
         --chip_video            <= chip_video_field;    -- Field        --> AV video output |
         --chip_video            <= chip_video_lp;       -- Left player  --> AV video output |
         --chip_video            <= chip_video_rp;       -- Right player --> AV video output |--> A single signal
-        chip_video            <= '1' when (chip_ball = '1' or chip_video_field = '1' or chip_video_lp = '1' or chip_video_rp = '1') else '0';
+        chip_video            <= '1' when ((chip_ball = '1' or chip_video_field = '1' or chip_video_lp = '1' or chip_video_rp = '1')
+                                            and (video_vblank_o = '1' or video_hblank_o = '1')) else '0';
         
         -- Connect chip video output to the main video output
         -- @TODO color logic. Currently black and white ONLY
@@ -321,7 +322,7 @@ begin
         --video_green_o         <= (others=>chip_video);
         --video_blue_o          <= (others=>chip_video);
         
-        video_red_o           <= std_logic_vector(to_unsigned(0, 8)) when (chip_video = '0' and (video_vblank_o = '1' or video_hblank_o = '1')) else std_logic_vector(to_unsigned(255, 8));
+        video_red_o           <= std_logic_vector(to_unsigned(0, 8)) when (chip_video = '0') else std_logic_vector(to_unsigned(255, 8));
         video_green_o         <= std_logic_vector(to_unsigned(0, 8));
         video_blue_o          <= std_logic_vector(to_unsigned(0, 8));
         video_hs_o            <= chip_video_hs;
