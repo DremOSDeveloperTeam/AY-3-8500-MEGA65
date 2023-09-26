@@ -251,7 +251,7 @@ begin
             i_clk           => clk_main_i,
             i_rst           => reset_soft_i or reset_hard_i,
             i_clk_divider   => clock_div_2m_i, 
-            i_duty_cycle    => '0',
+            i_duty_cycle    => '0',                             -- 50% duty cycle
             o_clk           => ce_2m
         );
         
@@ -260,7 +260,7 @@ begin
             i_clk           => clk_main_i,
             i_rst           => reset_soft_i or reset_hard_i,
             i_clk_divider   => clock_div_6m_i, 
-            i_duty_cycle    => '1',
+            i_duty_cycle    => '1',                             -- Small-as-possible duty cycle
             o_clk           => ce_6m
         );
      

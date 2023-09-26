@@ -29,6 +29,8 @@ create_generated_clock -name tmds_576p_clk [get_pins M2M/i_framework/i_clk_m2m/i
 create_generated_clock -name hdmi_576p_clk [get_pins M2M/i_framework/i_clk_m2m/i_clk_hdmi_576p/CLKOUT1]
 create_generated_clock -name main_clk      [get_pins M2M/CORE/clk_gen/i_clk_main/CLKOUT0]
 # Add more clocks here, if needed
+create_generated_clock -name ce_6m         -source [get_pins M2M/CORE/clk_gen/i_clk_main/CLKOUT0]   -divide_by 8    [get_pins M2M/CORE/i_main/i_ce_6m/o_clk]
+create_generated_clock -name ce_2m         -source [get_pins M2M/CORE/clk_gen/i_clk_main/CLKOUT0]   -divide_by 24   [get_pins M2M/CORE/i_main/i_ce_2m/o_clk]
 
 ## Clock divider sdcard_clk that creates the 25 MHz used by sd_spi.vhd
 create_generated_clock -name sdcard_clk -source [get_pins M2M/i_framework/i_clk_m2m/i_clk_qnice/CLKOUT0] -divide_by 2 [get_pins M2M/i_framework/QNICE_SOC/sd_card/Slow_Clock_25MHz_reg/Q]
