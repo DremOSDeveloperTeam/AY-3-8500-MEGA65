@@ -134,7 +134,11 @@ constant game_practice        : integer := 3;
 constant game_rifle1          : integer := 4;
 constant game_rifle2          : integer := 5;
 
-signal key_pressed_n : std_logic_vector(79 downto 0);
+signal key_pressed_n        : std_logic_vector(79 downto 0);
+signal manual_serve_held    : std_logic;
+signal paddle_size_held     : std_logic;
+signal ball_speed_held      : std_logic;
+signal ball_angle_held      : std_logic;
 
 -- Game controls
 
@@ -147,7 +151,7 @@ begin
    ball_angle_o                <= '1';
    game_select_o               <= "111111";
    game_select_o(game_tennis)  <= '0';
-   
+      
    keyboard_state : process(clk_main_i)
    begin
       if rising_edge(clk_main_i) then
@@ -167,55 +171,75 @@ begin
       else
         if rising_edge(clk_main_i) then
             -- Toggle for manual serve.
-            if (falling_edge(key_pressed_n(m65_v))) then -- On V key strike, changes manual serve.
-                manual_serve_o  <= not manual_serve_o;
+            if (key_pressed_n(m65_v) = '0') then -- On V key strike, changes manual serve.
+                if (not manual_serve_held) then
+                    manual_serve_o      <= not manual_serve_o;
+                    manual_serve_held   <= '1';
+                end if;
+            else
+                manual_serve_held       <= '0';
             end if;
             
             -- This handles manual serving.
             if (manual_serve_o = '1') then
-                if (falling_edge(key_pressed_n(m65_space))) then
+                if (key_pressed_n(m65_space) = '0') then
                     manual_serve_o         <= '1';
-                elsif (rising_edge(key_pressed_n(m65_space))) then
+                elsif (not key_pressed_n(m65_space)) then
                     manual_serve_o         <= '0';
                 end if;
             end if;
             
             -- This handles paddle/bat size
-            if (falling_edge(key_pressed_n(m65_c))) then
-                paddle_size_o   <= not paddle_size_o;
+            if (key_pressed_n(m65_c) = '0') then
+                if (not paddle_size_held) then
+                    paddle_size_o       <= not paddle_size_o;
+                    paddle_size_held    <= '1';
+                end if;
+            else
+                paddle_size_held        <= '0';
             end if;
             
             -- This handles ball speed
-            if (falling_edge(key_pressed_n(m65_x))) then
-                ball_speed_o    <= not ball_speed_o;
+            if (key_pressed_n(m65_x) = '0') then
+                if (not ball_speed_held) then
+                    ball_speed_o    <= not ball_speed_o;
+                    ball_speed_held <= '1';
+                end if;
+            else
+                ball_speed_held     <= '0';
             end if;
             
             -- This handles ball angle
-            if (falling_edge(key_pressed_n(m65_z))) then
-                ball_angle_o    <= not ball_angle_o;
+            if (key_pressed_n(m65_z) = '0') then
+                if (not ball_angle_held) then
+                    ball_angle_o    <= not ball_angle_o;
+                    ball_angle_held <= '1';
+                end if;
+            else
+                ball_angle_held     <= '0';
             end if;
             
             -- This handles game selection.
             -- Wow this is ugly code, but at least I know this works.
             -- @TODO make this unugly code.
-            if    (falling_edge(key_pressed_n(m65_1))) then
+            if    (key_pressed_n(m65_1) = '0' and game_select_o(game_tennis) = '1') then
                 game_select_o               <= "111111";
                 game_select_o(game_tennis)  <= '0';
-            elsif (falling_edge(key_pressed_n(m65_2))) then
+            elsif (key_pressed_n(m65_2) = '0' and game_select_o(game_soccer) = '1') then
                 game_select_o               <= "111111";
                 game_select_o(game_soccer)  <= '0';
-            elsif (falling_edge(key_pressed_n(m65_3))) then
+            elsif (key_pressed_n(m65_3) = '0' and game_select_o /= "111111") then
                 game_select_o               <= "111111";
-            elsif (falling_edge(key_pressed_n(m65_4))) then
+            elsif (key_pressed_n(m65_4) = '0' and game_select_o(game_squash) = '1') then
                 game_select_o               <= "111111";
                 game_select_o(game_squash)  <= '0';
-            elsif (falling_edge(key_pressed_n(m65_5))) then
+            elsif (key_pressed_n(m65_5) = '0' and game_select_o(game_practice) = '1') then
                 game_select_o               <= "111111";
                 game_select_o(game_practice)<= '0';
-            elsif (falling_edge(key_pressed_n(m65_6))) then
+            elsif (key_pressed_n(m65_6) = '0' and game_select_o(game_rifle1) = '1') then
                 game_select_o               <= "111111";
                 game_select_o(game_rifle1)  <= '0';
-            elsif (falling_edge(key_pressed_n(m65_7))) then
+            elsif (key_pressed_n(m65_7) = '0' and game_select_o(game_rifle2) = '1') then
                 game_select_o               <= "111111";
                 game_select_o(game_rifle2)  <= '0';
             end if;

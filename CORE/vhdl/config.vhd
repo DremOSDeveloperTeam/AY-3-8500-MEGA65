@@ -76,31 +76,33 @@ type WHS_RECORD_ARRAY_TYPE is array (0 to WHS_RECORDS - 1) of WHS_RECORD_TYPE;
 
 constant SCR_WELCOME : string :=
 
-   "Name of the Demo Core Version 1.0\n" &
-   "MiSTer port done by Demo Author in 2022\n\n" &
+   "AY-3-8500 for Mega65 Version 0.1.0\n" &
+   "MiSTer port done by Kaitlynn Martin in 2023\n\n" &
 
    -- We are not insisting. But it would be nice if you gave us credit for MiSTer2MEGA65 by leaving these lines in
-   "Powered by MiSTer2MEGA65 Version [WIP],\n" &
+   "Powered by MiSTer2MEGA65 Version 1.0.0,\n" &
    "done by sy2002 and MJoergen in 2022\n" &
 
-   "\n\nEdit config.vhd to modify welcome screen.\n\n" &
-   "You can for example show the keyboard map.\n" &
-   "Look at this example for the Demo core:\n\n\n" &
+   "\n\nThe AY-3-8500 plays pong.\n\n" &
 
-   "    Key                Demo core\n" &
+   "    Controls\n" &
    "    " & CHR_LINE_10 & CHR_LINE_10 & CHR_LINE_10 & CHR_LINE_1 & CHR_LINE_1 & "\n" &
-   "    Left Cursor        Paddle left\n" &
-   "    Right Cursor       Paddle right\n" &
-   "    Space              Start game\n" &
+   "    Paddles            Move bats\n" &
+   "    V                  Toggle manual serve\n" &
+   "    Space              Serve\n" &
+   "    C                  Toggle paddle size\n" &
+   "    X                  Toggle ball speed\n" &
+   "    Z                  Toggle ball angle\n" &
+   "    [1-7]              Game select\n" &
    "    Help               Options menu\n\n\n" &
 
    "\n\n    Press Space to continue.\n\n\n";
 
 constant HELP_1 : string :=
 
-   "\n Demo Core for MEGA65 Version 1\n\n" &
+   "\n AY-3-8500 for MEGA65 Version 0.1.0\n\n" &
 
-   " MiSTer port 2022 by YOU\n" &
+   " MiSTer port 2023 by Kaitlynn Martin\n" &
    " Powered by MiSTer2MEGA65\n\n\n" &
 
    " Lorem ipsum dolor sit amet, consetetur\n" &
