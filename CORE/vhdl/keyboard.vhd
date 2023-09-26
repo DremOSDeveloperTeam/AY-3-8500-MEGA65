@@ -145,12 +145,6 @@ signal ball_angle_held      : std_logic;
 begin
 
    example_n_o                 <= key_pressed_n;
-   manual_serve_o              <= '1';
-   paddle_size_o               <= '1';
-   ball_speed_o                <= '1';
-   ball_angle_o                <= '1';
-   game_select_o               <= "111111";
-   game_select_o(game_tennis)  <= '0';
       
    keyboard_state : process(clk_main_i)
    begin
