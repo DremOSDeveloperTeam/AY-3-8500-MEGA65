@@ -314,7 +314,7 @@ begin
         --chip_video            <= chip_video_lp;       -- Left player  --> AV video output |
         --chip_video            <= chip_video_rp;       -- Right player --> AV video output |--> A single signal
         chip_video            <= '1' when ((chip_ball = '1' or chip_video_field = '1' or chip_video_lp = '1' or chip_video_rp = '1')
-                                            and (video_vblank_o = '1' or video_hblank_o = '1')) else '0';
+                                            and (video_vblank_o = '0' or video_hblank_o = '0')) else '0';
         
         -- Connect chip video output to the main video output
         -- @TODO color logic. Currently black and white ONLY
