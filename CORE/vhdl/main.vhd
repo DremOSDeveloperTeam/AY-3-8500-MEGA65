@@ -170,9 +170,6 @@ end entity main;
 
 architecture synthesis of main is
 
--- @TODO: Remove these demo core signals
---signal keyboard_n          : std_logic_vector(79 downto 0);
-
 -- ay38500NTSC component declaration
 component ay38500NTSC is
     port (
@@ -192,8 +189,8 @@ component ay38500NTSC is
         pinManualServe        : in std_logic;   -- Manually serve the ball
         pinRPin_DWN           : out std_logic;  --
         pinLPin_DWN           : out std_logic;  --
-        pinRPin               : in std_logic;   -- Right pin control
-        pinLPin               : in std_logic;   -- Left pin control
+        pinRPin               : in std_logic_vector(7 downto 0);   -- Right pin control
+        pinLPin               : in std_logic_vector(7 downto 0);   -- Left pin control
         pinBatSize            : in std_logic;   -- 1 = Large, 0 = Small
         pinBallSpeed          : in std_logic;   -- 1 = Normal, 0 = Fast as fuck
         pinBallAngle          : in std_logic;   -- 1 = 2 rebound angles, 0 = 4
@@ -227,25 +224,28 @@ signal chip_ball              : std_logic;      -- Chip ball output @TODO make i
 signal chip_sound             : std_logic;      -- Chip's sound pin
 
 -- Controls for the game
-signal manual_serve_i                : std_logic;      -- Manually serve
-signal right_player_i                : std_logic;      -- Right player
-signal left_player_i                 : std_logic;      -- Left player
-signal bat_size_i                    : std_logic;      -- Size of the bat
-signal ball_speed_i                  : std_logic;      -- The speed of the ball
-signal ball_angle_i                  : std_logic;      -- Ball angles
-signal rifle_hit_i                   : std_logic;      -- Rifle hit
-signal rifle_shot_i                  : std_logic;      -- Rifle shot 
+signal manual_serve_i         : std_logic;      -- Manually serve
+signal right_player_i         : std_logic_vector(7 downto 0);      -- Right player
+signal left_player_i          : std_logic_vector(7 downto 0);      -- Left player
+signal bat_size_i             : std_logic;      -- Size of the bat
+signal ball_speed_i           : std_logic;      -- The speed of the ball
+signal ball_angle_i           : std_logic;      -- Ball angles
+signal rifle_hit_i            : std_logic;      -- Rifle hit
+signal rifle_shot_i           : std_logic;      -- Rifle shot 
 
 -- Games
-signal game_tennis_i                 : std_logic;
-signal game_soccer_i                 : std_logic;
-signal game_squash_i                 : std_logic;
-signal game_practice_i               : std_logic;
-signal game_rifle1_i                 : std_logic;
-signal game_rifle2_i                 : std_logic;
+constant game_tennis          : integer := 0;
+constant game_soccer          : integer := 1;
+constant game_squash          : integer := 2;
+constant game_practice        : integer := 3;
+constant game_rifle1          : integer := 4;
+constant game_rifle2          : integer := 5;
+signal game_select            : std_logic_vector(6 downto 0);
 
 -- Keyboard
-signal keyboard_n                    : std_logic_vector(79 downto 0);
+signal keyboard_n             : std_logic_vector(79 downto 0);
+
+-- Potentiometers (Paddles)
 
 begin
 
@@ -299,12 +299,12 @@ begin
             pinBallAngle      => ball_angle_i,
             pinHitIn          => rifle_hit_i,
             pinShotIn         => rifle_shot_i,
-            pinTennis         => game_tennis_i,
-            pinSoccer         => game_soccer_i,
-            pinSquash         => game_squash_i,
-            pinPractice       => game_practice_i,
-            pinRifle1         => game_rifle1_i,
-            pinRifle2         => game_rifle2_i
+            pinTennis         => game_select(game_tennis),
+            pinSoccer         => game_select(game_soccer),
+            pinSquash         => game_select(game_squash),
+            pinPractice       => game_select(game_practice),
+            pinRifle1         => game_select(game_rifle1),
+            pinRifle2         => game_select(game_rifle2)
         ); -- i_ay38500NTSC (the chip itself)
         
         -- The below connects ALL video signals to chip_video.
@@ -327,28 +327,19 @@ begin
         video_hs_o            <= chip_video_hs;
         video_vs_o            <= chip_video_vs;
         
-        manual_serve_i        <= '0';   -- @TODO this currently permenantly enables automatic serving. This should later be a choice for the user.
-        right_player_i        <= '0';   -- @TODO this just ties it low. Pretty sure this would just make it stuck "down" but im not entirely sure?
-        left_player_i         <= '0';
-        bat_size_i            <= '1';   -- @TODO this just makes the bat always large. This should be a choice for the player.
-        ball_speed_i          <= '1';   -- @TODO this just makes the ball speed always normal. Should be a choice.
-        ball_angle_i          <= '1';   -- @TODO this should be a choice
+        right_player_i        <= pot1_x_i;   -- @TODO Keyboard and joystick support not yet implemented. This only adds support for pots (or mouse).
+        left_player_i         <= pot1_y_i;
         rifle_hit_i           <= '0';   -- @TODO rifle support
         rifle_shot_i          <= '0';
         
         -- Games
         -- @TODO game selection. Currently forced to be tennis.
-        game_tennis_i         <= '0';
-        game_soccer_i         <= '1';
-        game_squash_i         <= '1';
-        game_practice_i       <= '1';
-        game_rifle1_i         <= '1';
-        game_rifle2_i         <= '1'; 
         
         
      i_keyboard : entity work.keyboard
       port map (
          clk_main_i           => clk_main_i,
+         i_rst                => reset_soft_i or reset_hard_i,
 
          -- Interface to the MEGA65 keyboard
          key_num_i            => kb_key_num_i,
@@ -359,7 +350,13 @@ begin
          --    bit 0: Space
          --    bit 1: Return
          --    bit 2: Run/Stop
-         example_n_o          => keyboard_n
+         example_n_o          => keyboard_n,
+         
+         manual_serve_o       => manual_serve_i,
+         paddle_size_o        => bat_size_i,
+         ball_speed_o         => ball_speed_i,
+         ball_angle_o         => ball_angle_i,
+         game_select_o        => game_select
       );
         
     /*i_chip : module work.ay38500NTSC

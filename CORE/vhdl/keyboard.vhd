@@ -27,6 +27,7 @@ use IEEE.NUMERIC_STD.ALL;
 entity keyboard is
    port (
       clk_main_i           : in std_logic;               -- core clock
+      i_rst                : in std_logic;               -- reset
          
       -- Interface to the MEGA65 keyboard
       key_num_i            : in integer range 0 to 79;   -- cycles through all MEGA65 keys
@@ -34,7 +35,13 @@ entity keyboard is
                
       -- @TODO: Create the kind of keyboard output that your core needs
       -- "example_n_o" is a low active register and used by the demo core
-      example_n_o          : out std_logic_vector(79 downto 0)
+      example_n_o          : out std_logic_vector(79 downto 0);
+      
+      manual_serve_o       : out std_logic;               -- When held low, manual serve is on. If manual serve is off, space will serve.
+      paddle_size_o        : out std_logic;               -- Paddle size, default large (1)
+      ball_speed_o         : out std_logic;               -- Ball speed, default normal (1)
+      ball_angle_o         : out std_logic;               -- Ball angle, default 2 (1)
+      game_select_o        : out std_logic_vector(6 downto 0)  -- Game selection
    );
 end keyboard;
 
@@ -119,11 +126,27 @@ constant m65_up_crsr       : integer := 73;  -- cursor up
 constant m65_left_crsr     : integer := 74;  -- cursor left
 constant m65_restore       : integer := 75;
 
+-- Games
+constant game_tennis          : integer := 0;
+constant game_soccer          : integer := 1;
+constant game_squash          : integer := 2;
+constant game_practice        : integer := 3;
+constant game_rifle1          : integer := 4;
+constant game_rifle2          : integer := 5;
+
 signal key_pressed_n : std_logic_vector(79 downto 0);
+
+-- Game controls
 
 begin
 
-   example_n_o <= key_pressed_n;
+   example_n_o                 <= key_pressed_n;
+   manual_serve_o              <= '1';
+   paddle_size_o               <= '1';
+   ball_speed_o                <= '1';
+   ball_angle_o                <= '1';
+   game_select_o               <= "111111";
+   game_select_o(game_tennis)  <= '0';
    
    keyboard_state : process(clk_main_i)
    begin
@@ -132,4 +155,108 @@ begin
       end if;
    end process;
 
+   controls_mgr   : process(clk_main_i, i_rst)
+   begin
+      if (i_rst='1') then
+        manual_serve_o              <= '1';
+        paddle_size_o               <= '1';
+        ball_speed_o                <= '1';
+        ball_angle_o                <= '1';
+        game_select_o               <= "111111";
+        game_select_o(game_tennis)  <= '0';
+      else
+        if rising_edge(clk_main_i) then
+            -- Toggle for manual serve.
+            if (falling_edge(key_pressed_n(m65_v))) then -- On V key strike, changes manual serve.
+                manual_serve_o  <= not manual_serve_o;
+            end if;
+            
+            -- This handles manual serving.
+            if (manual_serve_o = '1') then
+                if (falling_edge(key_pressed_n(m65_space))) then
+                    manual_serve_o         <= '1';
+                elsif (rising_edge(key_pressed_n(m65_space))) then
+                    manual_serve_o         <= '0';
+                end if;
+            end if;
+            
+            -- This handles paddle/bat size
+            if (falling_edge(key_pressed_n(m65_c))) then
+                paddle_size_o   <= not paddle_size_o;
+            end if;
+            
+            -- This handles ball speed
+            if (falling_edge(key_pressed_n(m65_x))) then
+                ball_speed_o    <= not ball_speed_o;
+            end if;
+            
+            -- This handles ball angle
+            if (falling_edge(key_pressed_n(m65_z))) then
+                ball_angle_o    <= not ball_angle_o;
+            end if;
+            
+            -- This handles game selection.
+            -- Wow this is ugly code, but at least I know this works.
+            -- @TODO make this unugly code.
+            if    (falling_edge(key_pressed_n(m65_1))) then
+                game_select_o               <= "111111";
+                game_select_o(game_tennis)  <= '0';
+            elsif (falling_edge(key_pressed_n(m65_2))) then
+                game_select_o               <= "111111";
+                game_select_o(game_soccer)  <= '0';
+            elsif (falling_edge(key_pressed_n(m65_3))) then
+                game_select_o               <= "111111";
+            elsif (falling_edge(key_pressed_n(m65_4))) then
+                game_select_o               <= "111111";
+                game_select_o(game_squash)  <= '0';
+            elsif (falling_edge(key_pressed_n(m65_5))) then
+                game_select_o               <= "111111";
+                game_select_o(game_practice)<= '0';
+            elsif (falling_edge(key_pressed_n(m65_6))) then
+                game_select_o               <= "111111";
+                game_select_o(game_rifle1)  <= '0';
+            elsif (falling_edge(key_pressed_n(m65_7))) then
+                game_select_o               <= "111111";
+                game_select_o(game_rifle2)  <= '0';
+            end if;
+        end if;
+      end if;
+   end process;
+
+   /*signal 
+   keyboard_pots  : process(clk_main_i)
+   begin
+      if rising_edge(clk_main_i) then
+         if (key_pressed_n(9) = '0') then
+         
+         elsif (key_pressed_n(13) = '0') then
+         
+         end if;
+      end if;
+   end process;*/
+
 end beh;
+
+/*library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.NUMERIC_STD.ALL;
+entity keyboard_mgr is
+    port (
+        clk_main_i           : in std_logic;               -- core clock
+        key_pressed_n
+        
+        emupot1_o            : out std_logic_vector(7 downto 0);
+        emupot2_o            : out std_logic_vector(7 downto 0)
+    );
+end keyboard_mgr;
+
+architecture synthesis of keyboard_mgr is
+    p_managepots : process(clk_main_i)
+    begin
+        if rising_edge(clk_main_i) then
+        
+        end if;
+    end process;
+begin
+
+end synthesis;*/
