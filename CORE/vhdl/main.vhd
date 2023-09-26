@@ -324,8 +324,8 @@ begin
         --video_blue_o          <= (others=>chip_video);
         
         video_red_o           <= std_logic_vector(to_unsigned(0, 8)) when (chip_video = '0') else std_logic_vector(to_unsigned(255, 8));
-        video_green_o         <= std_logic_vector(to_unsigned(0, 8));
-        video_blue_o          <= std_logic_vector(to_unsigned(0, 8));
+        video_green_o         <= std_logic_vector(to_unsigned(0, 8)) when (chip_video = '0') else std_logic_vector(to_unsigned(255, 8));
+        video_blue_o          <= std_logic_vector(to_unsigned(0, 8)) when (chip_video = '0') else std_logic_vector(to_unsigned(255, 8));
         video_hs_o            <= chip_video_hs;
         video_vs_o            <= chip_video_vs;
         
