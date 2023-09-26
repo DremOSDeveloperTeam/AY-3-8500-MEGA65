@@ -100,58 +100,57 @@ constant SCR_WELCOME : string :=
 
 constant HELP_1 : string :=
 
-   "\n AY-3-8500 for MEGA65 Version 0.1.0\n\n" &
+   "AY-3-8500 for MEGA65 Version 0.1.0\n\n" &
 
    " MiSTer port 2023 by Kaitlynn Martin\n" &
    " Powered by MiSTer2MEGA65\n\n\n" &
 
-   " Lorem ipsum dolor sit amet, consetetur\n" &
-   " sadipscing elitr, sed diam nonumy eirmod\n" &
-   " Mpor invidunt ut labore et dolore magna\n" &
-   " aliquyam erat, sed diam voluptua. At vero\n" &
-   " eos et accusam et justo duo.\n\n" &
 
-   " Dolores et ea rebum. Stet clita kasd gube\n" &
-   " gren, no sea takimata sanctus est Lorem ip\n" &
-   " Sed diam nonumy eirmod tempor invidunt ut\n" &
-   " labore et dolore magna aliquyam era\n\n" &
+   " The AY-3-8500 ("Ball & Paddle") is a chip\n" &
+   " that does one thing, and one thing well:\n" &
+   " Play pong.\n" &
+   " It plays 7 games in total: Tennis, soccer,\n" &
+   " squash, practice, and two shooting games.\n\n\n\n\n" &
 
-   " Cursor right to learn more.       (1 of 3)\n" &
+
+
+
+   " Would you like to know more?\n" &
+   "                  Cursor right: Next (1 of 3)\n" &
    " Press Space to close the help screen.";
 
 constant HELP_2 : string :=
 
-   "\n Demo Core for MEGA65 Version 1\n\n" &
+   "\n AY-3-8500 for MEGA65 Version 0.1.0\n\n" &
 
-   " XYZ ABCDEFGH:\n\n" &
+   " Controls:\n\n" &
 
-   " 1. ABCD EFGH\n" &
-   " 2. IJK LM NOPQ RSTUVWXYZ\n" &
-   " 3. 10 20 30 40 50\n\n" &
+   " Paddles            Move bats\n" &
+   " V                  Toggle manual serve\n" &
+   " Space              Serve\n" &
+   " C                  Toggle paddle size\n" &
+   " X                  Toggle ball speed\n" &
+   " Z                  Toggle ball angle\n" &
+   " [1-7]              Game select (see page 3)\n" &
+   " Help               Options menu\n\n\n\n" &
 
-   " a) Dolores et ea rebum\n" &
-   " b) Takimata sanctus est\n" &
-   " c) Tempor Invidunt ut\n" &
-   " d) Sed Diam Nonumy eirmod te\n" &
-   " e) Awesome\n\n" &
 
-   " Ut wisi enim ad minim veniam, quis nostru\n" &
-   " exerci tation ullamcorper suscipit lobor\n" &
-   " tis nisl ut aliquip ex ea commodo.\n\n" &
 
+   " Would you like to know more?\n" &
    " Crsr left: Prev  Crsr right: Next (2 of 3)\n" &
    " Press Space to close the help screen.";
 
 constant HELP_3 : string :=
 
-   "\n Help Screens\n\n" &
+   "\n AY-3-8500 for MEGA65 Version 0.1.0\n\n" &
 
-   " You can have 255 screens per help topic.\n\n" &
+   " Games:\n\n" &
 
-   " 15 topics overall.\n" &
-   " 1 menu item per topic.\n\n\n\n" &
+   " \n" &
+   " \n\n\n\n" &
 
-   " Cursor left to go back.           (3 of 3)\n" &
+   " Would you like to know more?\n" &
+   " Cursor left: Prev                 (3 of 3)\n" &
    " Press Space to close the help screen.";
 
 -- Concatenate all your Welcome and Help screens into one large string, so that during synthesis one large string ROM can be build.
