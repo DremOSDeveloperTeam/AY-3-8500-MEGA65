@@ -106,7 +106,7 @@ constant HELP_1 : string :=
    " Powered by MiSTer2MEGA65\n\n\n" &
 
 
-   " The AY-3-8500 ("Ball & Paddle") is a chip\n" &
+   " The AY-3-8500 ('Ball & Paddle') is a chip\n" &
    " that does one thing, and one thing well:\n" &
    " Play pong.\n" &
    " It plays 7 games in total: Tennis, soccer,\n" &
