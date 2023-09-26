@@ -183,7 +183,7 @@ component ay38500NTSC is
         pinRPout              : out std_logic;  -- Right player output
         pinLPout              : out std_logic;  -- Left player output
         pinSFout              : out std_logic;  -- Score field out
-        clk                   : in std_logic;   -- 2 (or 6 MHz..?)
+        clk                   : in std_logic;   -- 2 MHz
         superclock            : in std_logic;   -- 48 MHz
         reset                 : in std_logic;   -- Reset pin
         syncH                 : out std_logic;  -- Horizontal sync
@@ -244,6 +244,9 @@ signal game_practice_i               : std_logic;
 signal game_rifle1_i                 : std_logic;
 signal game_rifle2_i                 : std_logic;
 
+-- Keyboard
+signal keyboard_n                    : std_logic_vector(79 downto 0);
+
 begin
 
      i_ce_2m       : entity work.clock_div
@@ -281,7 +284,7 @@ begin
         port map (
             clk               => ce_2m,                             -- 2 MHz clock used for a reason
             superclock        => clk_main_i,
-            reset             => (not reset_soft_i) or (not reset_hard_i),      -- Long and short press of reset button mean the same
+            reset             => (not reset_soft_i) and (not reset_hard_i),      -- Long and short press of reset button mean the same
             syncH             => chip_video_hs,
             syncV             => chip_video_vs,
             pinRPout          => chip_video_rp,
@@ -343,10 +346,27 @@ begin
         game_rifle2_i         <= '1'; 
         
         
+     i_keyboard : entity work.keyboard
+      port map (
+         clk_main_i           => clk_main_i,
+
+         -- Interface to the MEGA65 keyboard
+         key_num_i            => kb_key_num_i,
+         key_pressed_n_i      => kb_key_pressed_n_i,
+
+         -- @TODO: Create the kind of keyboard output that your core needs
+         -- "example_n_o" is a low active register and used by the demo core:
+         --    bit 0: Space
+         --    bit 1: Return
+         --    bit 2: Run/Stop
+         example_n_o          => keyboard_n
+      );
+        
     /*i_chip : module work.ay38500NTSC
         port map (
         
         );*/
+        
    -- @TODO: Add the actual MiSTer core here
    -- The demo core's purpose is to show a test image and to make sure, that the MiSTer2MEGA65 framework
    -- can be synthesized and run stand-alone without an actual MiSTer core being there, yet
