@@ -240,7 +240,7 @@ constant game_squash          : integer := 2;
 constant game_practice        : integer := 3;
 constant game_rifle1          : integer := 4;
 constant game_rifle2          : integer := 5;
-signal game_select            : std_logic_vector(6 downto 0);
+signal game_select            : std_logic_vector(5 downto 0);
 
 -- Keyboard
 signal keyboard_n             : std_logic_vector(79 downto 0);

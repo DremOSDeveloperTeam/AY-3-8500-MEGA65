@@ -41,7 +41,7 @@ entity keyboard is
       paddle_size_o        : out std_logic;               -- Paddle size, default large (1)
       ball_speed_o         : out std_logic;               -- Ball speed, default normal (1)
       ball_angle_o         : out std_logic;               -- Ball angle, default 2 (1)
-      game_select_o        : out std_logic_vector(6 downto 0)  -- Game selection
+      game_select_o        : out std_logic_vector(5 downto 0)  -- Game selection
    );
 end keyboard;
 
