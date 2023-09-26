@@ -162,6 +162,11 @@ begin
         ball_angle_o                <= '1';
         game_select_o               <= "111111";
         game_select_o(game_tennis)  <= '0';
+        
+        manual_serve_held           <= '0';
+        paddle_size_held            <= '0';
+        ball_speed_held             <= '0';
+        ball_angle_held             <= '0';
       else
         if rising_edge(clk_main_i) then
             -- Toggle for manual serve.
@@ -178,7 +183,7 @@ begin
             if (manual_serve_o = '1') then
                 if (key_pressed_n(m65_space) = '0') then
                     manual_serve_o         <= '1';
-                elsif (not key_pressed_n(m65_space)) then
+                else
                     manual_serve_o         <= '0';
                 end if;
             end if;
